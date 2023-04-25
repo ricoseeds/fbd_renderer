@@ -5,7 +5,7 @@
 #include "glm/gtx/string_cast.hpp"
 
 // Default camera values
-const float DEF_FOV = 20.0f; // degrees
+const float DEF_FOV = 30.0f; // degrees
 
 //------------------------------------------------------------
 // Base Camera class constructor

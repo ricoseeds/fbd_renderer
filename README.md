@@ -20,4 +20,5 @@ mgui/imgui_impl_glfw.cpp vendor/imgui/imgui_impl_opengl3.cpp -framework OpenGl -
 ## LATest
 g++ -std=c++11 src/*.cpp  -framework OpenGl -I/usr/local/include -lglfw -lGLEW
 
-/a.out /Users/arghachakraborty/Projects/check/fbd/build/tetcli/outputhigh/
+## Armadilo
+./a.out /Users/arghachakraborty/Projects/check/fbd/build/tetcli/outputhigh/

@@ -10,10 +10,12 @@
 #include "glm/gtx/string_cast.hpp"
 
 #include "../include/ShaderProgram.h"
-#include "../include/Texture2D.h"
+// #include "../include/Texture2D.h"
 #include "../include/Camera.h"
 #include "../include/Mesh.h"
 #include <vector>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "../include/stb_image_write.h"
 
 // Global Variables
 const char *APP_TITLE = "SOFT TISSUE DEFORMATION";
@@ -43,6 +45,7 @@ void glfw_onKey(GLFWwindow *window, int key, int scancode, int action, int mode)
 void glfw_onFramebufferSize(GLFWwindow *window, int width, int height);
 void glfw_onMouseScroll(GLFWwindow *window, double deltaX, double deltaY);
 void glfw_onMouseMove(GLFWwindow *window, double posX, double posY);
+void saveImage(char *filepath, GLFWwindow *w);
 
 void update(double elapsedTime);
 void showFPS(GLFWwindow *window);
@@ -52,6 +55,22 @@ using namespace std;
 //-----------------------------------------------------------------------------
 // Main Application Entry Point
 //-----------------------------------------------------------------------------
+void saveImage(char *filepath, GLFWwindow *w)
+{
+	int width, height;
+	glfwGetFramebufferSize(w, &width, &height);
+	GLsizei nrChannels = 3;
+	GLsizei stride = nrChannels * width;
+	stride += (stride % 4) ? (4 - stride % 4) : 0;
+	GLsizei bufferSize = stride * height;
+	std::vector<char> buffer(bufferSize);
+	glPixelStorei(GL_PACK_ALIGNMENT, 4);
+	glReadBuffer(GL_FRONT);
+	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
+	stbi_flip_vertically_on_write(true);
+	stbi_write_png(filepath, width, height, nrChannels, buffer.data(), stride);
+}
+
 template <typename T>
 bool ParseString(const std::string &str, T &val)
 {
@@ -79,7 +98,7 @@ int main(int argc, char **argv)
 	vector<vector<glm::vec3>> allvs;
 
 	mesh[0].loadOBJ(mainpath + "000.obj", true);
-	for (int i = 1; i <= 100; i++)
+	for (int i = 1; i <= 400; i++)
 	{
 
 		string te = to_string(i);
@@ -135,7 +154,7 @@ int main(int argc, char **argv)
 		if (ticker > 0.07)
 		{
 			tickerTime = glfwGetTime();
-			mesh[0].assignVerts(allvs[counteri++ % 100]);
+			mesh[0].assignVerts(allvs[counteri++ % 400]);
 			mesh[0].initBuffers();
 			std::cout << "HERE  ... ";
 		}
@@ -266,8 +285,22 @@ int main(int argc, char **argv)
 		}
 
 		// Swap front and back buffers
+		std::string name_ = to_string(counteri);
+		if (name_.length() == 1)
+		{
+			name_ = "00" + name_;
+		}
+		else if (name_.length() == 2)
+		{
+			name_ = "0" + name_;
+		}
+		std::string fpath = "./images/img" + name_ + ".png";
+		char *cstr = new char[fpath.length() + 1]; // allocate memory for the null-terminated string
+		std::strcpy(cstr, fpath.c_str());
+		// saveImage(cstr, gWindow);
+
 		glfwSwapBuffers(gWindow);
-		mac_patch(gWindow);
+		// mac_patch(gWindow);
 		lastTime = currentTime;
 	}
 
